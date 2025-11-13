@@ -233,7 +233,7 @@
       showSpinner(true);
       hideError();
       showNoData(false);
-      fetch(DATA_URL)
+      fetch(API_URL)
         .then(resp=>resp.json())
         .then(json=>{
           if(!json.ok||!Array.isArray(json.data))throw new Error('Respuesta inválida del endpoint');
