@@ -2,319 +2,52 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CTO Metrics Dashboard</title>
+  <title>ClaraMente · Panel CEO v0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Paleta ClaraMente -->
   <style>
     :root {
-      --main-bg: #f4f8fa;
-      --blue: #2d6cdf;
-      --dark: #203152;
-      --white: #fff;
-      --text: #1a2236;
-      --contrast: #ff2b2b;
-      --card-bg: #fff;
-      --border: #e3e8ee;
+      --cm-blue: #2563eb;
+      --cm-bg: #0f172a;
+      --cm-card: #111827;
+      --cm-border: #1f2937;
+      --cm-text: #e5e7eb;
+      --cm-muted: #9ca3af;
+      --cm-danger: #ef4444;
+      --cm-success: #22c55e;
+      --cm-warning: #f97316;
     }
+
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: var(--main-bg);
-      color: var(--dark);
-      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 60%);
+      color: var(--cm-text);
     }
-    header {
-      background: var(--blue);
-      color: var(--white);
-      padding: 1rem 2rem;
-      text-align: center;
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-    .container {
+
+    .shell {
       max-width: 1200px;
-      margin: 2rem auto;margin-bottom:4rem;
-      background: var(--card-bg);
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(32,49,82,0.05);
-      padding: 2rem;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
     }
-    .filters {
+
+    header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: flex-end;
-      margin-bottom: 2rem;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
     }
-    .filters label {
-      display: block;
-      font-weight: 500;
-      margin-bottom: 0.25rem;
-      color: var(--dark);
-    }
-    select, input[type="date"] {
-      padding: 0.5rem;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      background: var(--main-bg);
-      color: var(--text);
-      min-width: 150px;
-      font-size: 1rem;
-    }
-    .kpi {
+
+    header h1 {
+      font-size: 1.8rem;
       display: flex;
-      justify-content: space-between;
-      gap:2rem;
-      margin-bottom:2rem;
-    }
-    .kpi-card {
-      background: var(--main-bg);
-      border: 2px solid var(--border);
-      border-radius: 6px;
-      padding: 1rem 2rem;
-      flex: 1;
-      min-width:180px;
-      text-align:center;
-    }
-    .kpi-title {
-      font-weight: 700;
-      color: var(--blue);
-      font-size:1.1rem;
-      margin-bottom: .25rem;
-    }
-    .kpi-value {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--contrast);
-    }
-    .charts {
-      display: flex;
-      flex-wrap: wrap;
-      gap:2rem;
-      margin-bottom:2rem;
-    }
-    .chart-container {
-      flex:1;
-      min-width:320px;
-      background:var(--main-bg);
-      border: 2px solid var(--border);
-      border-radius: 6px;
-      padding:1rem;
-      box-sizing:border-box;
-      margin-bottom:1rem;
-    }
-    table.metrics-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 2rem;
-    }
-    table.metrics-table th, table.metrics-table td {
-      border: 1px solid var(--border);
-      padding: .75rem .5rem;
-      text-align: left;
-    }
-    table.metrics-table th {
-      background: var(--blue);
-      color:var(--white);
-      font-weight:600;
-      text-align:center;
-    }
-    table.metrics-table tr:nth-child(even) {
-      background: #f4f8fa;
-    }
-    .spinner {
-      text-align: center;
-      padding: 3rem 0;
-    }
-    .spinner:after {
-      content: '';
-      display: inline-block;
-      width: 32px; height:32px;
-      border: 4px solid var(--blue);
-      border-radius:50%;
-      border-right-color:transparent;
-      animation: spin .8s linear infinite;
-      margin-left:8px;
-      vertical-align:middle;
-    }
-    @keyframes spin {
-      to{ transform:rotate(360deg); }
-    }
-    .error-msg {
-      background: var(--contrast);
-      color: var(--white);
-      padding: 1rem;
-      border-radius: 6px;
-      margin: 2rem 0;
-      text-align:center;
-      font-weight:700;
-    }
-    @media (max-width: 900px) {
-      .container{padding:1rem;}
-      .kpi{flex-direction:column;gap:1rem;}
-      .charts{flex-direction:column;gap:1rem;}
-      .chart-container{min-width:180px;}
-    }
-    @media (max-width: 600px) {
-      header{font-size:1.4rem;padding:1rem;}
-      .container{padding:.25rem;}
-      table.metrics-table th, table.metrics-table td{font-size:0.8rem;}
-      .kpi-card{padding:1rem;}
-    }
-  </style>
-</head>
-<body>
-  <header>CTO Metrics Dashboard</header>
-  <main class="container" aria-label="Panel principal de métricas">
-    <form class="filters" aria-label="Filtros">
-      <div>
-        <label for="eventSelect">Evento</label>
-        <select id="eventSelect" multiple aria-label="Filtrar por nombre de evento"></select>
-      </div>
-      <div>
-        <label for="startDate">Fecha inicio</label>
-        <input type="date" id="startDate" aria-label="Seleccionar fecha de inicio" />
-      </div>
-      <div>
-        <label for="endDate">Fecha fin</label>
-        <input type="date" id="endDate" aria-label="Seleccionar fecha de fin" />
-      </div>
-      <button type="button" id="applyFilters" style="padding:0.5rem 1.2rem; background:var(--blue); color:var(--white);border:none;border-radius:4px;font-weight:700" aria-label="Aplicar filtros">Filtrar</button>
-    </form>
-    <section class="kpi" aria-label="KPI métricas del último día">
-      <div class="kpi-card">
-        <div class="kpi-title">Último día</div>
-        <div class="kpi-value" id="latestDay">-</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-title">P95 Response Time</div>
-        <div class="kpi-value" id="latestP95">-</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-title">Total Requests</div>
-        <div class="kpi-value" id="latestRequests">-</div>
-      </div>
-    </section>
-    <section class="charts" aria-label="Visualización gráfica">
-      <div class="chart-container">
-        <canvas id="p95Chart" aria-label="Gráfico P95 por día" role="img"></canvas>
-      </div>
-      <div class="chart-container">
-        <canvas id="requestChart" aria-label="Gráfico de total de requests por día" role="img"></canvas>
-      </div>
-    </section>
-    <section aria-label="Tabla de métricas">
-      <div id="table-placeholder"></div>
-    </section>
-    <div id="loading" class="spinner" style="display:none">Cargando datos</div>
-    <div id="error" class="error-msg" style="display:none"></div>
-    <div id="no-data" class="error-msg" style="display:none;background:#f4f8fa;color:var(--blue);border:1px solid var(--blue);">No hay datos para los filtros seleccionados</div>
-  </main>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-  <script>
-    const API_URL = 'https://claramente-edge-functions.vercel.app/api/metrics-daily';
-    const eventSelect = document.getElementById('eventSelect');
-    const startDate = document.getElementById('startDate');
-    const endDate = document.getElementById('endDate');
-    const applyBtn = document.getElementById('applyFilters');
-    const loading = document.getElementById('loading');
-    const errorDiv = document.getElementById('error');
-    const noData = document.getElementById('no-data');
-    const tableDiv = document.getElementById('table-placeholder');
-    let rawData = [];
-    let filteredData = [];
-
-    function showSpinner(show){loading.style.display=show?'block':'none';}
-    function showError(msg){errorDiv.textContent=msg;errorDiv.style.display='block';}
-    function hideError(){errorDiv.style.display='none';}
-    function showNoData(show){noData.style.display=show?'block':'none';}
-
-    function loadData(){
-      showSpinner(true);
-      hideError();
-      showNoData(false);
-      fetch(API_URL)
-        .then(resp=>resp.json())
-        .then(json=>{
-          if(!json.ok||!Array.isArray(json.data))throw new Error('Respuesta inválida del endpoint');
-          rawData = json.data;
-          if(!rawData.length){showNoData(true);renderTable([]);renderKPIs();renderCharts([]);return;}
-          fillEventNames();
-          applyFilters();
-        })
-        .catch(err=>{showSpinner(false);showError('Error en la carga: '+err.message);tableDiv.innerHTML='';renderKPIs();renderCharts([]);})
-        .finally(()=>showSpinner(false));
+      align-items: center;
+      gap: 8px;
     }
 
-    function fillEventNames(){
-      const eventNames = [...new Set(rawData.map(x=>x.event_name))];
-      eventSelect.innerHTML = eventNames.map(e=>`<option value="${e}">${e}</option>`).join('');
-    }
-
-    function applyFilters(){
-      hideError();
-      showNoData(false);
-      const selectedEvents = Array.from(eventSelect.selectedOptions).map(x=>x.value);
-      const start = startDate.value;
-      const end = endDate.value;
-      filteredData = rawData.filter(x=>{
-        let ok = true;
-        if(selectedEvents.length)ok&=selectedEvents.includes(x.event_name);
-        if(start)ok&=(x.day>=start);
-        if(end)ok&=(x.day<=end);
-        return ok;
-      });
-      if(!filteredData.length){showNoData(true);}else{showNoData(false);}
-      renderKPIs();
-      renderCharts(filteredData);
-      renderTable(filteredData);
-    }
-
-    function renderKPIs(){
-      if(!filteredData.length){
-        latestDay.textContent = latestP95.textContent = latestRequests.textContent = '-';
-        return;
-      }
-      const latest = filteredData.reduce((max,x)=>x.day>max.day?x:max,filteredData[0]);
-      latestDay.textContent = (latest.day||'-').split('T')[0];
-      latestP95.textContent = latest.p95_response_time??'-';
-      latestRequests.textContent = latest.total_requests??'-';
-    }
-
-    let p95Chart,requestChart;
-    function renderCharts(data){
-      const ctxLine = document.getElementById('p95Chart').getContext('2d');
-      const ctxBar = document.getElementById('requestChart').getContext('2d');
-      let labels = data.map(x=>x.day.split('T')[0]);
-      let p95data = data.map(x=>x.p95_response_time);
-      let reqData = data.map(x=>x.total_requests);
-      if(p95Chart)p95Chart.destroy();
-      if(requestChart)requestChart.destroy();
-      p95Chart = new Chart(ctxLine,{
-        type:'line',
-        data:{labels,datasets:[{label:'P95 Response Time',data:p95data,borderColor:'#2d6cdf',backgroundColor:'rgba(45,108,223,0.15)',tension:0.2,fill:true}]},
-        options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
-      });
-      requestChart = new Chart(ctxBar,{
-        type:'bar',
-        data:{labels,datasets:[{label:'Total Requests',data:reqData,backgroundColor:'#ff2b2b'}]},
-        options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
-      });
-    }
-
-    function renderTable(data){
-      if(!data.length){tableDiv.innerHTML='<table class="metrics-table"><thead><tr><th>Día</th><th>Evento</th><th>Requests</th><th>P95</th></tr></thead><tbody><tr><td colspan="4" style="text-align:center;">Sin datos</td></tr></tbody></table>';return;}
-      let html='<table class="metrics-table"><thead><tr><th>Día</th><th>Evento</th><th>Requests</th><th>P95</th></tr></thead><tbody>';
-      for(const x of data){
-        html+=`<tr><td>${(x.day||'').split('T')[0]}</td><td>${x.event_name}</td><td>${x.total_requests}</td><td>${x.p95_response_time}</td></tr>`;
-      }
-      html+='</tbody></table>';
-      tableDiv.innerHTML = html;
-    }
-
-    applyBtn.addEventListener('click',applyFilters);
-
-    window.addEventListener('DOMContentLoaded',loadData); 
-  </script>
-</body>
-</html>
+    header h1 span.logo-dot {
+      width: 10px
