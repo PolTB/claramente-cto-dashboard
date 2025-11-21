@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>ClaraMente · Panel CEO v0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --cm-blue: #2563eb;
+      --cm-bg: #0f172a;
+      --cm-card: #111827;
+      --cm-border: #1f2937;
+      --cm-text: #e5e7eb;
+      --cm-muted: #9ca3af;
+      --cm-danger: #ef4444;
+      --cm-success: #22c55e;
+      --cm-warning: #f97316;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 60%);
+      color: var(--cm-text);
+    }
+    .shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--cm-blue);
+      display: inline-block;
+    }
+    header p {
+      color: var(--cm-muted);
+      max-width: 720px;
+      font-size: 0.95rem;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .toolbar label {
+      font-size: 0.8rem;
+      color: var(--cm-muted);
+    }
+    .toolbar input {
+      background: #020617;
+      border-radius: 999px;
+      border: 1px solid var(--cm-border);
+      color: var(--cm-text);
+      padding: 6px 10px;
+      font-size: 0.85rem;
+    }
+    .toolbar button {
+      border-radius: 999px;
+      border: none;
+      background: var(--cm-blue);
+      color: white;
+      font-size: 0.85rem;
+      padding: 8px 14px;
+      cursor: pointer;
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .toolbar button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: minmax(0, 1fr); }
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 16px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      padding: 14px 16px 16px;
+      box-shadow: 0 10px 40px rgba(15, 23, 42, 0.9);
+    }
+    .card h2, .card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge {
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--cm-muted);
+    }
+    .helper {
+      margin: 4px 0 8px;
+      font-size: 0.8rem;
+      color: var(--cm-muted);
+    }
+    .kpi-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .kpi {
+      flex: 1 1 110px;
+      min-width: 110px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: #020617;
+    }
+    .kpi label {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--cm-muted);
+      margin-bottom: 4px;
+    }
+    .kpi .value {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .kpi .trend {
+      font-size: 0.75rem;
+      margin-left: 4px;
+    }
+    .trend-up { color: var(--cm-success); }
+    .trend-down { color: var(--cm-danger); }
+    .trend-flat { color: var(--cm-muted); }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+    @media (min-width: 900px) {
+      .charts-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+    }
+    .chart-container {
+      position: relative;
+      height: 220px;
+    }
+    .summary-list {
+      list-style: disc;
+      padding-left: 20px;
+      margin: 6px 0 0;
+      font-size: 0.85rem;
+    }
+    .summary-list li {
+      margin-bottom: 4px;
+    }
+    .summary-note {
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: var(--cm-muted);
+    }
+    .kpi-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.8rem;
+    }
+    .kpi-table th,
+    .kpi-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+    }
+    .kpi-table th {
+      text-align: left;
+      color: var(--cm-muted);
+      font-weight: 500;
+    }
+    .badge-status {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+    .badge-green {
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--cm-success);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+    .badge-yellow {
+      background: rgba(234, 179, 8, 0.1);
+      color: #eab308;
+      border: 1px solid rgba(234, 179, 8, 0.4);
+    }
+    .badge-red {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--cm-danger);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--cm-muted);
+    }
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--cm-blue);
+    }
+    footer {
+      margin-top: 24px;
+      font-size: 0.75rem;
+      color: var(--cm-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <h1>
+        <span class="logo-dot"></span>
+        ClaraMente · Panel CEO v0
+      </h1>
+      <p>
+        Vista ejecutiva diaria con foco en DAU/MAU, adherencia, upgrade, NPS, riesgo,
+        rendimiento (p95) y coste estimado por tokens (CFO).
+      </p>
+
+      <div class="toolbar">
+        <label>Rango:</label>
+        <input type="date" id="fromDate" />
+        <span>→</span>
+        <input type="date" id="toDate" />
+        <button id="refreshBtn">Actualizar datos</button>
+        <span class="pill">
+          <span class="pill-dot"></span>
+          Fuente: /api/metrics-ceo-daily
+        </span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2>Métricas clave <span class="badge">Último día</span></h2>
+          <p class="helper">
+            Resumen del último punto temporal disponible en el rango seleccionado.
+          </p>
+          <div class="kpi-row" id="kpiRow"></div>
+        </div>
+
+        <div class="charts-grid" style="margin-top: 12px;">
+          <div class="card">
+            <h3>DAU vs MAU</h3>
+            <p class="helper">Actividad diaria vs mensual (usuarios únicos).</p>
+            <div class="chart-container">
+              <canvas id="chartDauMau"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Adherencia (Stickiness %)</h3>
+            <p class="helper">DAU / MAU × 100. Objetivo: ≥ 45%.</p>
+            <div class="chart-container">
+              <canvas id="chartStickiness"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Upgrade Intent (%)</h3>
+            <p class="helper">
+              Usuarios con upgrade_click / DAU × 100. Objetivo inicial: ≥ 28%.
+            </p>
+            <div class="chart-container">
+              <canvas id="chartUpgradeIntent"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Upgrade Conversion (%)</h3>
+            <p class="helper">
+              subscription_created / MAU × 100 (Sprint 3).
+            </p>
+            <div class="chart-container">
+              <canvas id="chartUpgradeConversion"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>NPS diario</h3>
+            <p class="helper">NPS y media móvil 7 días.</p>
+            <div class="chart-container">
+              <canvas id="chartNps"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Usuarios en riesgo (48h)</h3>
+            <p class="helper">Usuarios que han dejado de interactuar ≥ 48h.</p>
+            <div class="chart-container">
+              <canvas id="chartRisk"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>p95 Response Time (ms)</h3>
+            <p class="helper">Rendimiento percibido. Umbral crítico: 2000ms.</p>
+            <div class="chart-container">
+              <canvas id="chartP95"></canvas>
+            </div>
+          </div>
+
+          <div class="card" id="cardCost">
+            <h3>Coste diario estimado (€)</h3>
+            <p class="helper">
+              Basado en tokens consumidos × coste CFO (0,00019 €/token).
+            </p>
+            <div class="chart-container">
+              <canvas id="chartCost"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>
+            Executive Summary
+            <span class="badge">Perplexity Labs</span>
+          </h2>
+          <p class="helper">
+            Pega aquí la salida generada por Perplexity Labs con el prompt
+            <code>prompt_panels_ceo_v1</code>.
+          </p>
+          <ul class="summary-list" id="summaryList">
+            <li>Estado general del negocio (DAU/MAU y stickiness).</li>
+            <li>Salud de conversión (upgrade intent/conversion).</li>
+            <li>Experiencia y rendimiento (p95 y usuarios en riesgo).</li>
+            <li>Coste por tokens y eficiencia del sistema.</li>
+            <li>Riesgos clave + 3 recomendaciones accionables.</li>
+          </ul>
+          <p class="summary-note">
+            Nota: v0 usa resumen manual pegado desde Labs. Futuras versiones pueden
+            automatizar esta integración.
+          </p>
+        </div>
+
+        <div class="card" style="margin-top: 12px;">
+          <h3>Tabla de KPIs (último día)</h3>
+          <p class="helper">
+            Vista compacta para Board. Colorea según objetivos CMO/CFO.
+          </p>
+          <table class="kpi-table" id="kpiTable">
+            <thead>
+              <tr>
+                <th>KPI</th>
+                <th>Valor</th>
+                <th>Tendencia 7d</th>
+                <th>Objetivo</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <span>ClaraMente · Panel CEO v0 · T5.2</span>
+      <span id="footerInfo"></span>
+    </footer>
+  </div>
+
+  <script>
+    const API_BASE =
+      "https://claramente-edge-functions.vercel.app/api/metrics-ceo-daily";
+
+    let charts = {};
+
+    function toDateOnly(d) {
+      if (!d) return "";
+      const dt = new Date(d);
+      if (Number.isNaN(dt.getTime())) return "";
+      const yyyy = dt.getFullYear();
+      const mm = String(dt.getMonth() + 1).padStart(2, "0");
+      const dd = String(dt.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function computeTrendIcon(values) {
+      if (!values || values.length < 2) return { cls: "trend-flat", txt: "·" };
+      const last = values[values.length - 1];
+      const first = values[0];
+      if (last > first * 1.05) return { cls: "trend-up", txt: "↑" };
+      if (last < first * 0.95) return { cls: "trend-down", txt: "↓" };
+      return { cls: "trend-flat", txt: "·" };
+    }
+
+    function statusBadge(kpi, val) {
+      if (val === null || val === undefined || Number.isNaN(val)) {
+        return { cls: "badge-yellow", label: "sin datos" };
+      }
+      switch (kpi) {
+        case "stickiness":
+          if (val >= 45) return { cls: "badge-green", label: "OK" };
+          if (val >= 35) return { cls: "badge-yellow", label: "Atención" };
+          return { cls: "badge-red", label: "Crítico" };
+        case "upgrade_intent":
+          if (val >= 28) return { cls: "badge-green", label: "OK" };
+          if (val >= 20) return { cls: "badge-yellow", label: "Atención" };
+          return { cls: "badge-red", label: "Bajo" };
+        case "p95":
+          if (val < 2000) return { cls: "badge-green", label: "OK" };
+          if (val < 3000) return { cls: "badge-yellow", label: "Lento" };
+          return { cls: "badge-red", label: "Crítico" };
+        case "risk":
+          if (val <= 0) return { cls: "badge-green", label: "OK" };
+          if (val <= 5) return { cls: "badge-yellow", label: "Moderado" };
+          return { cls: "badge-red", label: "Alto" };
+        default:
+          return { cls: "badge-yellow", label: "–" };
+      }
+    }
+
+    function createOrUpdateChart(id, type, labels, datasets, extraOptions = {}) {
+      const ctx = document.getElementById(id).getContext("2d");
+      if (charts[id]) {
+        charts[id].data.labels = labels;
+        charts[id].data.datasets = datasets;
+        charts[id].update();
+        return;
+      }
+
+      charts[id] = new Chart(ctx, {
+        type,
+        data: {
+          labels,
+          datasets,
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: "#e5e7eb",
+                font: { size: 11 },
+              },
+            },
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: "#9ca3af",
+                maxRotation: 0,
+                autoSkip: true,
+              },
+              grid: {
+                color: "rgba(55,65,81,0.4)",
+              },
+            },
+            y: {
+              ticks: {
+                color: "#9ca3af",
+              },
+              grid: {
+                color: "rgba(31,41,55,0.6)",
+              },
+            },
+          },
+          ...extraOptions,
+        },
+      });
+    }
+
+    async function fetchData(from, to) {
+      const params = new URLSearchParams();
+      if (from) params.set("from", from);
+      if (to) params.set("to", to);
+      const url = params.toString() ? `${API_BASE}?${params}` : API_BASE;
+
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`Error fetching: ${res.status} ${res.statusText}`);
+      }
+      const json = await res.json();
+      if (!json || !json.ok) {
+        throw new Error(`Respuesta no OK del backend: ${JSON.stringify(json)}`);
+      }
+
+      const raw = json.data;
+      const arr = Array.isArray(raw) ? raw : raw ? [raw] : [];
+      arr.sort((a, b) => {
+        const da = new Date(a.ref_date || a.day || 0).getTime();
+        const db = new Date(b.ref_date || b.day || 0).getTime();
+        return da - db;
+      });
+      return arr;
+    }
+
+    function updateUI(series) {
+      const footerInfo = document.getElementById("footerInfo");
+      const kpiRow = document.getElementById("kpiRow");
+      const kpiTableBody = document.querySelector("#kpiTable tbody");
+      const costCard = document.getElementById("cardCost");
+
+      if (!series.length) {
+        footerInfo.textContent = "Sin datos en el rango seleccionado.";
+        kpiRow.innerHTML = "";
+        kpiTableBody.innerHTML = "";
+        Object.values(charts).forEach((ch) => ch.destroy());
+        charts = {};
+        return;
+      }
+
+      const labels = series.map((d) => toDateOnly(d.ref_date || d.day));
+      const dau = series.map((d) => d.dau ?? 0);
+      const mau = series.map((d) => d.mau ?? 0);
+      const stickiness = series.map((d) => d.stickiness_percent ?? 0);
+      const upIntent = series.map((d) => d.upgrade_intent_percent ?? 0);
+      const upConv = series.map((d) => d.upgrade_conversion_percent ?? 0);
+      const nps = series.map((d) => d.nps_score ?? d.avg_nps ?? null);
+      const risk = series.map((d) => d.risk_users_48h ?? 0);
+      const p95 = series.map((d) => d.p95_ms ?? 0);
+      const cost = series.map((d) => d.est_cost_eur ?? null);
+
+      const last = series[series.length - 1];
+      const lastDate = labels[labels.length - 1];
+      footerInfo.textContent = `Último dato: ${lastDate || "–"}`;
+
+      kpiRow.innerHTML = "";
+      const kpisMain = [
+        { label: "DAU", value: last.dau ?? 0, trendArr: dau },
+        { label: "MAU", value: last.mau ?? 0, trendArr: mau },
+        {
+          label: "Stickiness (%)",
+          value: last.stickiness_percent ?? 0,
+          format: (v) => `${v.toFixed(1)}%`,
+          trendArr: stickiness,
+        },
+        {
+          label: "Upgrade Intent (%)",
+          value: last.upgrade_intent_percent ?? 0,
+          format: (v) => `${v.toFixed(1)}%`,
+          trendArr: upIntent,
+        },
+        {
+          label: "NPS",
+          value: last.nps_score ?? last.avg_nps ?? null,
+          trendArr: nps,
+        },
+        {
+          label: "Riesgo 48h",
+          value: last.risk_users_48h ?? 0,
+          trendArr: risk,
+        },
+        {
+          label: "p95 (ms)",
+          value: last.p95_ms ?? 0,
+          trendArr: p95,
+        },
+        {
+          label: "Coste día (€)",
+          value: last.est_cost_eur ?? null,
+          format: (v) => `€${v.toFixed(2)}`,
+          trendArr: cost.filter((v) => v !== null),
+        },
+      ];
+
+      kpisMain.forEach((k) => {
+        const div = document.createElement("div");
+        div.className = "kpi";
+        const trend = computeTrendIcon(k.trendArr);
+        const v =
+          k.value === null || k.value === undefined
+            ? "–"
+            : k.format
+            ? k.format(Number(k.value))
+            : String(k.value);
+        div.innerHTML = `
+          <label>${k.label}</label>
+          <span class="value">${v}</span>
+          <span class="trend ${trend.cls}">${trend.txt}</span>
+        `;
+        kpiRow.appendChild(div);
+      });
+
+      createOrUpdateChart(
+        "chartDauMau",
+        "line",
+        labels,
+        [
+          {
+            label: "DAU",
+            data: dau,
+            borderColor: "#2563eb",
+            backgroundColor: "rgba(37,99,235,0.2)",
+            tension: 0.2,
+          },
+          {
+            label: "MAU",
+            data: mau,
+            borderColor: "#22c55e",
+            backgroundColor: "rgba(34,197,94,0.15)",
+            tension: 0.2,
+          },
+        ]
+      );
+
+      createOrUpdateChart(
+        "chartStickiness",
+        "line",
+        labels,
+        [
+          {
+            label: "Stickiness (%)",
+            data: stickiness,
+            borderColor: "#2563eb",
+            backgroundColor: "rgba(37,99,235,0.25)",
+            tension: 0.2,
+          },
+        ],
+        {
+          scales: { y: { min: 0, max: 100 } },
+        }
+      );
+
+      createOrUpdateChart(
+        "chartUpgradeIntent",
+        "bar",
+        labels,
+        [
+          {
+            label: "Upgrade Intent (%)",
+            data: upIntent,
+            backgroundColor: "rgba(37,99,235,0.5)",
+            borderColor: "#2563eb",
+          },
+        ],
+        {
+          scales: { y: { min: 0, max: 100 } },
+        }
+      );
+
+      createOrUpdateChart(
+        "chartUpgradeConversion",
+        "line",
+        labels,
+        [
+          {
+            label: "Upgrade Conversion (%)",
+            data: upConv,
+            borderColor: "#a855f7",
+            backgroundColor: "rgba(168,85,247,0.25)",
+            tension: 0.2,
+          },
+        ],
+        {
+          scales: { y: { min: 0, max: 100 } },
+        }
+      );
+
+      createOrUpdateChart(
+        "chartNps",
+        "line",
+        labels,
+        [
+          {
+            label: "NPS / Avg",
+            data: nps,
+            borderColor: "#22c55e",
+            backgroundColor: "rgba(34,197,94,0.25)",
+            tension: 0.2,
+          },
+        ]
+      );
+
+      createOrUpdateChart(
+        "chartRisk",
+        "bar",
+        labels,
+        [
+          {
+            label: "Usuarios riesgo 48h",
+            data: risk,
+            backgroundColor: "rgba(239,68,68,0.5)",
+            borderColor: "#ef4444",
+          },
+        ]
+      );
+
+      createOrUpdateChart(
+        "chartP95",
+        "line",
+        labels,
+        [
+          {
+            label: "p95 (ms)",
+            data: p95,
+            borderColor: "#f97316",
+            backgroundColor: "rgba(249,115,22,0.25)",
+            tension: 0.2,
+          },
+        ]
+      );
+
+      const hasCost = cost.some((v) => v !== null && !Number.isNaN(v));
+      if (hasCost) {
+        costCard.style.display = "block";
+        createOrUpdateChart(
+          "chartCost",
+          "bar",
+          labels,
+          [
+            {
+              label: "Coste estimado (€)",
+              data: cost,
+              backgroundColor: "rgba(37,99,235,0.5)",
+              borderColor: "#2563eb",
+            },
+          ]
+        );
+      } else {
+        costCard.style.display = "none";
+      }
+
+      kpiTableBody.innerHTML = "";
+      const stickinessVal = last.stickiness_percent ?? null;
+      const upgradeIntentVal = last.upgrade_intent_percent ?? null;
+      const p95Val = last.p95_ms ?? null;
+      const riskVal = last.risk_users_48h ?? null;
+      const costVal = last.est_cost_eur ?? null;
+
+      const rows = [
+        {
+          kpi: "Stickiness (%)",
+          value:
+            stickinessVal === null ? "–" : `${stickinessVal.toFixed(1)}%`,
+          trendArr: stickiness,
+          target: "≥ 45%",
+          key: "stickiness",
+        },
+        {
+          kpi: "Upgrade Intent (%)",
+          value:
+            upgradeIntentVal === null
+              ? "–"
+              : `${upgradeIntentVal.toFixed(1)}%`,
+          trendArr: upIntent,
+          target: "≥ 28%",
+          key: "upgrade_intent",
+        },
+        {
+          kpi: "p95 (ms)",
+          value: p95Val === null ? "–" : `${p95Val.toFixed(0)} ms`,
+          trendArr: p95,
+          target: "< 2000 ms",
+          key: "p95",
+        },
+        {
+          kpi: "Usuarios riesgo 48h",
+          value: riskVal === null ? "–" : `${riskVal}`,
+          trendArr: risk,
+          target: "tendencia decreciente",
+          key: "risk",
+        },
+        {
+          kpi: "Coste día (€)",
+          value: costVal === null ? "–" : `€${costVal.toFixed(2)}`,
+          trendArr: cost.filter((v) => v !== null),
+          target: "optimizar / margen CFO",
+          key: "cost",
+        },
+      ];
+
+      rows.forEach((r) => {
+        const trend = computeTrendIcon(r.trendArr);
+        const numericVal = parseFloat(
+          (r.value || "").toString().replace(/[^\d.-]/g, "")
+        );
+        const status = statusBadge(r.key, numericVal);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${r.kpi}</td>
+          <td>${r.value}</td>
+          <td><span class="${trend.cls}">${trend.txt}</span></td>
+          <td>${r.target}</td>
+          <td><span class="badge-status ${status.cls}">${status.label}</span></td>
+        `;
+        kpiTableBody.appendChild(tr);
+      });
+    }
+
+    async function refresh() {
+      const btn = document.getElementById("refreshBtn");
+      btn.disabled = true;
+      btn.textContent = "Cargando...";
+
+      const from = document.getElementById("fromDate").value || "";
+      const to = document.getElementById("toDate").value || "";
+
+      try {
+        const data = await fetchData(from, to);
+        updateUI(data);
+      } catch (e) {
+        console.error(e);
+        alert("Error cargando datos del Panel CEO. Revisa consola / backend.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Actualizar datos";
+      }
+    }
+
+    (function init() {
+      const to = new Date();
+      const from = new Date();
+      from.setDate(to.getDate() - 90);
+      document.getElementById("toDate").value = toDateOnly(to);
+      document.getElementById("fromDate").value = toDateOnly(from);
+      document.getElementById("refreshBtn").addEventListener("click", refresh);
+      refresh();
+    })();
+  </script>
+</body>
+</html>
